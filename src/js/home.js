@@ -1,138 +1,149 @@
-import './general';
+// jshint esversion: 6, node: true
+import "./general";
+
 const regeneratorRuntime = require("regenerator-runtime");
 
-/* Part 1 - Check out the validation module in services/formValidation */
-import validateRegistrationForm from './services/formValidation/validateRegistrationForm';
-
-import toastr from 'toastr';
-import 'toastr/toastr.scss';
+import validateRegistrationForm from "./services/formValidation/validateRegistrationForm";
+import toastr from "toastr";
+import "toastr/toastr.scss";
 
 class Home {
-  constructor() {
-    /* Part 2 - Finish the constructor
-       - Add references to each of these elements on the page
-          this.$form = 
-          this.$username = 
-          this.$email = 
-          this.$phone = 
-          this.$profession = 
-          this.$experience = 
-          this.$comment = 
-          this.$submit = 
-          this.$loadingIndicator = 
-      - Add a submit handler to the form that calls onFormSubmit
-        - You don't actually want to submit the form so you'll have to 
-          prevent the default behavior on the event when it fires.
-          That means that you'll need the event as a parameter to onFormSubmit
-    */
-  }
+	constructor() {
+		this.$navbar = document.getElementById("navbar");
+		this.$form = document.getElementById("registrationForm");
+		this.$username = document.getElementById("username");
+		this.$email = document.getElementById("email");
+		this.$phone = document.getElementById("phone");
+		this.$profession = document.getElementById("profession");
+		this.$experience = document.getElementById("experience");
+		this.$comment = document.getElementById("comment");
+		this.$submit = document.getElementById("submit");
+		this.$loadingIndicator = document.getElementById("loadingIndicator");
+		this.onFormSubmit = this.onFormSubmit.bind(this);
+		this.$form.onsubmit = this.onFormSubmit;
 
-  /* Part 3 - Write the first version of onFormSubmit */
-  onFormSubmit(event) {
-    // make sure the form is not submitted
-    // get the values from the form and store in a variable - use getFormValues()
+		this.checkValues();
+		this.addEventListeners();
+	}
 
-    /* call the validateRegistrationForm method 
-       pass variable from line above as a parameter.
-       It will return an object that you should store in a varable
-    */
+	checkValues(i) {
+		let resultsForm = this.getFormValues();
+		let resultsValidated = validateRegistrationForm(resultsForm);
 
-    // if the form is valid
-    //    clear the errors
-    //    call submitForm with the values from the form as a parameter
-    //    (only the stub for submitForm is written. You'll write it  
-    //     after testing validation and talking about the ajax call service)
-    // otherwise
-    //    clear all of the errors
-    //    highlight the errors
-    // end if
-  }
+		this.highlightInputs(resultsValidated.result);
 
-  /* Part 4 - Finish these 4 UI related methods */
+		if (i == 1) resultsValidated.isValid ? this.submitForm(resultsForm) : {};
+	}
 
-  /* This method packages up all of the form data into one object
-     Get the data from each of the form fields.
-     Notice how the experience that is checked is retrieved.
-  */
-  getFormValues() {
-    return {
-      username: this.$username.value,
-      email: "",
-      phone: "",
-      profession: "",
-      experience: document.querySelector('input[name="experience"]:checked').value,
-      comment: "",
-    };
-  }
+	addEventListeners() {
+		this.$form.addEventListener("input", () => this.checkValues());
+	}
 
-  /* This method clears each of the form fields.
-     It gets called after the form is submitted successfully.
-     Do the same kind of thing for the other input fields.
-  */
-  resetForm() {
-    this.$username.value = '';
-    this.$profession.value = 'school';
-    this.$experience.checked = true;
-  }
+	onFormSubmit(e) {
+		e.preventDefault();
 
-  /* This method styles each of the form fields that contains an error.
-     It gets called after the form is validated when errors occurr.
-     Do the same kind of thing for the other input fields
-  */
-  highlightErrors(result) {
-    if(!result.username) {
-      this.$username.classList.add('is-invalid');
-    }
-  }
+		this.checkValues(1);
+	}
 
-  /* This method removes the style for errors from all form fields.
-     It gets called after the form is validated.
-     Do the same kind of thing for the other input fields.
-  */
-  clearErrors() {
-    this.$username.classList.remove('is-invalid');
-  }
+	getFormValues() {
+		return {
+			username: this.$username.value,
+			email: this.$email.value,
+			phone: this.$phone.value,
+			profession: this.$profession.value,
+			experience: document.querySelector('input[name="experience"]:checked').value,
+			comment: this.$comment.value,
+		};
+	}
 
-  /* TEST - Instantiate a Home object at bottom of file first */
+	resetForm() {
+		this.$username.value = "";
+		this.$email.value = "";
+		this.$phone.value = "";
+		this.$profession.value = "college";
+		this.$experience.checked = true;
+		this.$comment.value = "";
+		this.checkValues();
+	}
 
-  /* Part 5 - review how you used fetch to get data in the weather app.  This time we'll be making a post request */
+	highlightInputs(result) {
+		// Username
+		if (result.username) {
+			this.$username.classList.add("is-valid");
+			this.$username.classList.remove("is-invalid");
+		} else {
+			this.$username.classList.remove("is-valid");
+			this.$username.classList.add("is-invalid");
+		}
 
-  /* Part 6 - Finish this function.  It makes the api call.  TEST */
-  submitForm(formValues) {
+		// Email
+		if (result.email) {
+			this.$email.classList.add("is-valid");
+			this.$email.classList.remove("is-invalid");
+		} else {
+			this.$email.classList.remove("is-valid");
+			this.$email.classList.add("is-invalid");
+		}
 
-    // hide the submit button - adding bootstrap style visually-hidden will do that
-    // show the loading indicator - removing bootstrap style visually-hidden will do that
+		// Phone
+		if (result.phone) {
+			this.$phone.classList.add("is-valid");
+			this.$phone.classList.remove("is-invalid");
+		} else {
+			this.$phone.classList.remove("is-valid");
+			this.$phone.classList.add("is-invalid");
+		}
 
-    const requestOptions = {
-      method: 'POST',
-      mode: 'cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formValues)
-    };
+		// Profession
+		if (result.profession) {
+			this.$profession.classList.add("is-valid");
+			this.$profession.classList.remove("is-invalid");
+		} else {
+			this.$profession.classList.remove("is-valid");
+			this.$profession.classList.add("is-invalid");
+			toastr.error("Profession value wasn't an acceptable value.");
+		}
 
-    /* call fetch passing SERVER_URL (from the .env file) and requestOptions as parameters
-       When the ajax call returns
-          if the status property of the request is 2XX then
-            show the submit button
-            hide the loading indicator
-            use toastr to show a message that uses the user's name
-            toastr.success(message will go here);
-            reset the form
-          else
-            show the submit button
-            hide the loading indicator
-            use toastr to show an error message that includes the response.status and response.statusText
-            toastr.error(error message goes here);
-          end if
-       When there's an error
-          show the submit button
-          hide the loading indicator
-          use toastr to show an error message
-          toastr.error(error message goes here);
-    */
-  }
-} // end of the class definition
+		// Experience
+		if (result.experience === false) toastr.error("Experience value wasn't an acceptable value.");
+	}
 
-// add a window onload handler. 
-// It should create an (unnamed) instance of the class for this page
+	submitForm(formValues) {
+		this.toggleSubmissionVisibility(false);
 
+		const requestOptions = {
+			method: "POST",
+			mode: "cors",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(formValues)
+		};
+
+		fetch(SERVER_URL, requestOptions)
+			.then(res => {
+				if (res.status >= 200 && res.status < 300) {
+					this.toggleSubmissionVisibility(true);
+					toastr.success(`${formValues.username} was successfully registered.`);
+					this.resetForm();
+				} else {
+					this.toggleSubmissionVisibility(true);
+					toastr.error(`There was an error with the response status: ${res.status}.`);
+				}
+			})
+			.catch(err => {
+				this.toggleSubmissionVisibility(true);
+				toastr.error(`There was an error: ${err}.`);
+			});
+	}
+
+	toggleSubmissionVisibility(b) {
+		if (b) {
+			this.$submit.classList.remove("visually-hidden");
+			this.$loadingIndicator.classList.add("visually-hidden");
+		} else {
+			this.$submit.classList.add("visually-hidden");
+			this.$loadingIndicator.classList.remove("visually-hidden");
+		}
+	}
+}
+
+window.addEventListener("load", () => new Home());
